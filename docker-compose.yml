@@ -1,0 +1,56 @@
+version "3"
+
+services:
+  backend-spring-app:
+    build: springdemo/.
+    ports:
+      - "8080:8080"
+    restart: always
+    hostname: backend-spring-app
+    enviroment:
+    networks:
+      testing_net:
+        ipv4_address: 172.28.1.1
+    extra_hosts:
+      - "frontend-angular-demo:172.28.1.2"
+      - "database-sql-demo:172.28.1.3"
+
+  frontend-angular-demo:
+    build: angulardemo/.
+    ports:
+     - "4200:4200"
+    restart: always
+    hostname: frontend-angular-demo
+    enviroment: 
+    networks:
+      testing_net:
+        ipv4_address: 172.28.1.2
+    extra_hosts:
+      - "backend-spring-demo:172.28.1.1"
+      - "database-sql-demo:172.28.1.3"
+      
+  database-sql-demo:
+    build: database/.
+    volumes:
+      - ./init.sql/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data/
+    enviroment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - PGPORT=${DB_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+    restart: "on-failure"
+    hostname: database-sql-demo
+    networks:
+      testing_net:
+        ipv4_address:172.28.1.3
+    extra_hosts:
+      - "backend-spring-demo:172.28.1.1"
+      - "frontend-angular-demo:172.28.1.2"
+
+networks:
+  testing_net:
+    ipam:
+      driver: bridge
+      config:
+        - subnet: "172.28.0.0/16"
