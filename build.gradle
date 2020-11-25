@@ -23,8 +23,8 @@ test {
 
 docker {
      name "${project.name}:${project.version}"
-     files 'springbootify.jar'
-     tag 'DockerHub', "chreess1/DemoDockerProject:${project.version}"
+     files 'ChrisWebApp.jar'
+     tag 'DockerHub', "chreess1/SysAdminFinalProject:${project.version}"
 }
 
 dockerRun {
